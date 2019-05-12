@@ -11,4 +11,4 @@ Note: playlist bisa banyak
 
 ## Jawaban
 
-Terdapat 2 file, yaitu file readmp3.c dan mediaplayer.c. File readmp3.c untuk membuat FUSE filesystem
+Terdapat 2 file, yaitu file readmp3.c dan mediaplayer.c. File readmp3.c untuk membuat FUSE filesystem sedangkan file mediaplayer.c untuk thread menjalankan mp3.
