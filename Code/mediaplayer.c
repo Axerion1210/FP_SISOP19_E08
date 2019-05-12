@@ -283,11 +283,6 @@ int main(void)
                 }
             }
         }
-        else if (strcmp(command, "pause") == 0) {
-            pausestatus = 1;
-            if (playstatus == 1) printf("Paused...\n");
-            else printf("No song is played.\n");
-        }
         else if (strcmp(command, "prev") == 0) {
             if (current_list == -1)
                 current_mp3 = (current_mp3 - 1 + totalsong) % totalsong;
@@ -309,6 +304,11 @@ int main(void)
             stopstatus = 1;
             playstatus = 1;
             printf("Playing Next Song.\n");
+        }
+        else if (strcmp(command, "pause") == 0) {
+            pausestatus = 1;
+            if (playstatus == 1) printf("Paused...\n");
+            else printf("No song is played.\n");
         }
         else if (strcmp(command, "resume") == 0) {
             pausestatus = 0;
