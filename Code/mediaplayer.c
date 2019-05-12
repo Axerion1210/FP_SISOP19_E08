@@ -75,9 +75,8 @@ void* player(void* arg)
         dp = opendir(musicdir);
         int cnt = 0;
         stopstatus = 0;
-        while (playstatus == 0) {
+        while (playstatus == 0)
             sleep(1);
-        }
        
         while ((de = readdir(dp)) != NULL) {
             if (strcmp(de->d_name, "..") == 0 || strcmp(de->d_name, ".") == 0)
@@ -99,9 +98,8 @@ void* player(void* arg)
         dev = ao_open_live(driver, &format, NULL);
 
         while (playstatus == 1 && stopstatus == 0) {
-            while (pausestatus == 1) {
+            while (pausestatus == 1)
                 sleep(1);
-            }
             if (mpg123_read(mh, buffer, buffer_size, &done) == MPG123_OK)
                 ao_play(dev, buffer, done);
             else {
