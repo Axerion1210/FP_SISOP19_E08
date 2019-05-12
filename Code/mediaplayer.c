@@ -33,15 +33,7 @@ int reloadstatus = 0;
 
 pthread_t t;
 
-int isDigit(char* x) {
-    for (int i = 0; i < strlen(x); i++) {
-        if (!('0' <= x[i] && x[i] <= '9'))
-            return 0;
-    }
-    return 1;
-}
-
-void* player(void* arg)
+void* player(void* arg) //fungsi untuk memainkan mp3 
 {
     char tmppath[1005];
     mpg123_handle *mh;
@@ -125,14 +117,23 @@ void* player(void* arg)
     return NULL;
 }
 
+int isDigit(char* x) //untuk mengecek apakah sebuah string berupa bilangan
+{
+    for (int i = 0; i < strlen(x); i++) {
+        if (!('0' <= x[i] && x[i] <= '9'))
+            return 0;
+    }
+    return 1;
+}
+
 int main(void)
 {
     system("clear");
     memset(totalListSong, 0, sizeof(totalListSong));
-    int err = pthread_create(&(t),NULL,&player,NULL); //membuat thread
+    int err = pthread_create(&(t),NULL,&player,NULL); //membuat thread player
     DIR *dp;
     struct dirent *de;
-    dp = opendir(musicdir);
+    dp = opendir(musicdir); //mengambil semua file dari dirpath
     while ((de = readdir(dp)) != NULL) {
         if (strcmp(de->d_name, "..") == 0 || strcmp(de->d_name, ".") == 0)
             continue;
@@ -163,7 +164,7 @@ int main(void)
         printf("Command: ");
         scanf("%s", command);
         system("clear");
-        if (strcmp(command, "stop") == 0) {
+        if (strcmp(command, "stop") == 0) { //stop lagu
             if (playstatus == 1) {
                 stopstatus = 1;
                 playstatus = 0;
@@ -172,7 +173,7 @@ int main(void)
             }
             else printf("No song is played.\n\n");
         }
-        else if (strcmp(command, "help") == 0) {
+        else if (strcmp(command, "help") == 0) { //command help
             printf("Command List:\n");
             printf("1.  list : List all songs\n");
             printf("2.  play ([Song Name].mp3 | [Song Number]) : Play a song\n");
@@ -191,7 +192,7 @@ int main(void)
             printf("15. help : List all commands\n");
             printf("16. exit : Exit media player\n");
         }
-        else if (strcmp(command, "play") == 0) {
+        else if (strcmp(command, "play") == 0) { //play lagu
             scanf(" %[^\n]", song);
             system("clear");
             dp = opendir(musicdir);
@@ -246,7 +247,7 @@ int main(void)
             }
             else printf("Song not available.\n");
         }
-        else if (strcmp(command, "list") == 0) {
+        else if (strcmp(command, "list") == 0) { //daftar lagu
             printf("List Song :\n");
             int cnt = 0;
             if (current_list == -1) {
@@ -283,7 +284,7 @@ int main(void)
                 }
             }
         }
-        else if (strcmp(command, "prev") == 0) {
+        else if (strcmp(command, "prev") == 0) { //lagu sebelumnya
             if (current_list == -1)
                 current_mp3 = (current_mp3 - 1 + totalsong) % totalsong;
             else {
@@ -294,7 +295,7 @@ int main(void)
             playstatus = 1;
             printf("Playing Previous Song.\n");
         }
-        else if (strcmp(command, "next") == 0) {
+        else if (strcmp(command, "next") == 0) { //lagu berikutnya
             if (current_list == -1)
                 current_mp3 = (current_mp3 + 1 + totalsong) % totalsong;
             else {
@@ -305,17 +306,17 @@ int main(void)
             playstatus = 1;
             printf("Playing Next Song.\n");
         }
-        else if (strcmp(command, "pause") == 0) {
+        else if (strcmp(command, "pause") == 0) { //pause lagu
             pausestatus = 1;
             if (playstatus == 1) printf("Paused...\n");
             else printf("No song is played.\n");
         }
-        else if (strcmp(command, "resume") == 0) {
+        else if (strcmp(command, "resume") == 0) { //resume lagu
             pausestatus = 0;
             if (playstatus == 1) printf("Resume...\n");
             else printf("No song is played.\n");
         }
-        else if (strcmp(command, "playlist") == 0) {
+        else if (strcmp(command, "playlist") == 0) { //daftar playlist
             if (totalList == 0) printf("No Available playlist.\n");
             else {
                 printf("List of playlist\n");
@@ -323,7 +324,7 @@ int main(void)
                     printf("%2d. %s\n", i + 1, pname[i]);
             }
         }
-        else if (strcmp(command, "addl") == 0) {
+        else if (strcmp(command, "addl") == 0) { //add playlist
             char tmpplaylist[1005];
             scanf(" %[^\n]", tmpplaylist);
             system("clear");
@@ -341,7 +342,7 @@ int main(void)
                 printf("Playlist Created.\n");
             }
         }
-        else if (strcmp(command, "reml") == 0) {
+        else if (strcmp(command, "reml") == 0) { //remove playlist
             char tmpplaylist[1005];
             scanf(" %[^\n]", tmpplaylist);
             system("clear");
@@ -365,7 +366,7 @@ int main(void)
                 printf("Playlist Removed.\n");
             }
         }
-        else if (strcmp(command, "addsong") == 0) {
+        else if (strcmp(command, "addsong") == 0) { //tambah lagu di playlist
             char tmpplaylist[1005];
             scanf(" %[^\n]", tmpplaylist);
             system("clear");
@@ -431,7 +432,7 @@ int main(void)
                 else printf("Song not available.\n");
             }
         }
-        else if (strcmp(command, "remsong") == 0) {
+        else if (strcmp(command, "remsong") == 0) { //remove lagu di playlist
             char tmpplaylist[1005];
             scanf(" %[^\n]", tmpplaylist);
             system("clear");
@@ -509,7 +510,7 @@ int main(void)
                 }
             }
         }
-        else if (strcmp(command, "movel") == 0) {
+        else if (strcmp(command, "movel") == 0) { //pindah playlist
             char tmpplaylist[1005];
             scanf(" %[^\n]", tmpplaylist);
             system("clear");
@@ -535,7 +536,7 @@ int main(void)
                 }
             }
         }
-        else if (strcmp(command, "back") == 0) {
+        else if (strcmp(command, "back") == 0) { //kembali ke global playlist
             if (current_list == -1) {
                 printf("You're already in the global playlist.\n");
             }
@@ -546,7 +547,7 @@ int main(void)
                 printf("Back to the global playlist.\n");
             }
         }
-        else if (strcmp(command, "exit") == 0) {
+        else if (strcmp(command, "exit") == 0) { //keluar media player
             printf("Closing media player\n");
             sleep(2);
             system("clear");
