@@ -12,7 +12,7 @@
 
 pthread_t tid;
 
-char type[100];
+char command[100];
 int mp3_pause=0;
 int mp3_play=0;
 int mp3_seek=0; // 0 normal, negative : backward, positive : forward
@@ -137,6 +137,18 @@ void *player(void *arg){
     printf("Command : \n");
 }
 
+void now_playing()
+{
+    printf("Playing %s\n", now_playing);
+    mp3_play = 0;
+    sleep(1);
+    mp3_play = 1;
+    mp3_pause = 0;
+    mp3_seek = 0;
+    pthread_create(&tid,NULL,&player,now_playing);
+    system("clear");
+}
+
 int main(int argc, char *argv[])
 {
 	DIR *dp;
@@ -147,17 +159,19 @@ int main(int argc, char *argv[])
         if (select_mp3 > 0)
             printf("Now Playing : %s\n\n", now_playing);
         
-        printf("Help :\nopen to open music\nstop to stop music\n   p to play/pause music\n   , to rewind music\n   . to forward music\nprev to play previous music\nnext to play next music\nexit to exit mp3player\n\n");
+        printf("Help :\nopen : open music\nstop : stop music\n   p : play/pause music\n");
+        printf("   , : rewind music\n   . : forward music\nprev : play previous music\n");
+        printf("next : play next music\nexit : exit media player\n\n");
         printf("Command : ");
-        scanf("%s", type);
+        scanf("%s", command);
         system("clear");
-        if (strcmp(type,"p")==0) {
-            if (mp3_pause==1)
+        if (strcmp(command,"p")==0) {
+            if (mp3_pause)
                 mp3_pause = 0;
             else
                 mp3_pause = 1;
         }
-        else if (strcmp(type,"open")==0){
+        else if (strcmp(command,"open")==0){
             printf("PlayList :\n");
             int no = 1;
             dp = opendir(dirpath);
@@ -171,7 +185,7 @@ int main(int argc, char *argv[])
                 }
             }
 
-            printf("\n\nPutar nomor : ");
+            printf("\n\nSong number : ");
             int selected_before = select_mp3;
             scanf("%d", &select_mp3);
             if (select_mp3<1 || select_mp3 >= no) {
@@ -198,18 +212,13 @@ int main(int argc, char *argv[])
                     no++;
                 }
             }
-
-            printf("Opening %s\n", now_playing);
-            mp3_play = 0;
-            sleep(1);
-            mp3_play = 1;
-            mp3_pause = 0;
-            mp3_seek = 0;
-            pthread_create(&tid,NULL,&player,now_playing);
-            system("clear");
+            now_playing();
         }
-        else if (strcmp(type,"next")==0){
-            select_mp3++;
+        else if (strcmp(command,"next")==0 || strcmp(command,"prev")==0){
+            if(strcmp(command,"next")==0)
+                select_mp3++;
+            else
+                select_mp3--;
             int no = 1;
             dp = opendir(dirpath);
             while ((de = readdir(dp)) != NULL) {
@@ -226,74 +235,47 @@ int main(int argc, char *argv[])
                     no++;
                 }
             }
-            if (select_mp3<1 || select_mp3>=no){
-                printf("Lagu tidak ditemukan!\n");
+            if (select_mp3 >= no){
+                printf("End of song list\n");
                 select_mp3--;
                 sleep(2);
                 system("clear");
                 continue;
             }
-
-            printf("Opening %s\n", now_playing);
-            mp3_play = 0;
-            sleep(1);
-            mp3_play = 1;
-            mp3_pause = 0;
-            mp3_seek = 0;
-            pthread_create(&tid,NULL,&player,now_playing);
-            system("clear");
-        }
-        else if (strcmp(type,"prev")==0){
-            select_mp3--;
-            int no = 1;
-            dp = opendir(dirpath);
-            while ((de = readdir(dp)) != NULL) {
-                int len = strlen(de->d_name);
-                char fn[1024];
-                sprintf(fn, "%s", de->d_name);
-                
-                if (strcmp(fn+strlen(fn)-4,".mp3")==0) {
-                    if (no == select_mp3) {
-                        sprintf(now_playing, "%s", de->d_name);
-                        no++;
-                        break;
-                    }
-                    no++;
-                }
-            }
-            if (select_mp3<1 || select_mp3>=no){
-                printf("Lagu tidak ditemukan!\n");
+            else if (select_mp3<1){
+                printf("Start of the song list!\n");
                 select_mp3++;
                 sleep(2);
                 system("clear");
                 continue;
             }
 
-            printf("Opening %s\n", now_playing);
-            mp3_play = 0;
-            sleep(1);
-            mp3_play = 1;
-            mp3_pause = 0;
-            mp3_seek = 0;
-            pthread_create(&tid,NULL,&player,now_playing);
-            system("clear");
+            now_playing();
         }
-        else if (strcmp(type,",")==0)
+        else if (strcmp(command,",")==0)
             mp3_seek -= 200;
-        else if (strcmp(type,".")==0)
+        else if (strcmp(command,".")==0)
             mp3_seek += 200;
-        else if (strcmp(type,"exit")==0){
+        else if (strcmp(command,"exit")==0){
             mp3_play = 0;
-            printf("Closing mp3player\n");
+            printf("Closing media player\n");
             sleep(2);
+            system("clear");
             break;
         }
-        else if (strcmp(type,"stop")==0){
+        else if (strcmp(command,"stop")==0){
             mp3_play = 0;
-            printf("Stop playing %s\n", now_playing);
+            printf("Media player stopped\n");
             select_mp3 = -1;
             sleep(1);
             system("clear");
         }
+        else
+        {
+            printf("Invalid command!!\n");
+            sleep(1);
+            system("clear");
+        }
+        
     }
 }
