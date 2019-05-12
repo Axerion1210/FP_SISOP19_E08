@@ -16,7 +16,7 @@
 #endif
 
 
-static const char *dirpath = "/home/ivan";
+static const char *dirpath = "/home/siung2";
 
 struct node {
     char *value;
@@ -32,19 +32,11 @@ typedef int (*Compare)(const char *, const char *);
 
 int check(const char* text)
 { 
-    char str[1024];
-    sprintf(str,"%s", text);
-    char str2[1024];
-    char tmp[1024];
-    //memset(tmp,'\0',sizeof(tmp));
-    char * pch;
-    pch=strrchr(str,'.');
-    int y = pch-str+1;
-    strcpy(str2,str+y);
-    if (strcmp(str2,"mp3")==0){
+    int length = strlen(text);
+    if(length<5) return 0;
+    if(text[length-4]=='.' && text[length-3]=='m' && text[length-2]=='p' && text[length-1]=='3')
         return 1;
-    }
-    return 0;
+    else return 0;
 }
 
 //inserts elements into the tree
@@ -126,6 +118,7 @@ static int xmp_getattr(const char *path, struct stat *stbuf)
 static int listdir(const char *path, void *buf, fuse_fill_dir_t filler,
 		       off_t offset, struct fuse_file_info *fi)
 {
+    if (strcmp("/home/siung2/fp/mount", path) == 0) return 0;
     DIR *dp;
 	struct dirent *de;
 	(void) offset;
