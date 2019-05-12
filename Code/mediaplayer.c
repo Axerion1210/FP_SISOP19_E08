@@ -31,7 +31,6 @@ int stopstatus = 0;
 int pausestatus = 0;
 int reloadstatus = 0;
 
-
 pthread_t t;
 
 int isDigit(char* x) {
@@ -185,12 +184,12 @@ int main(void)
             printf("5.  prev : Play previous song\n");
             printf("6.  pause : Pause current song\n");
             printf("7.  resume : Resume current song\n");
-            printf("8.  listp : List all playlists\n");
-            printf("9.  addp [Playlist Name] : Make New playlist\n");
-            printf("10. remp [Playlist Name] : Remove playlist\n");
-            printf("11. addsp [Playlist Name] press enter, then ([Song Name].mp3 | [Song Number]) : Add Song To playlist\n");
-            printf("12. remsp [Playlist Name] press enter, then ([Song Name].mp3 | [Song Number]) : Remove Song From playlist\n");
-            printf("13. movep [Playlist Name] : Move to playlist\n");
+            printf("8.  playlist : List all playlists\n");
+            printf("9.  addl [Playlist Name] : Create new playlist\n");
+            printf("10. reml [Playlist Name] : Remove playlist\n");
+            printf("11. addsong [Playlist Name] press enter, then ([Song Name].mp3 | [Song Number]) : Add song to playlist\n");
+            printf("12. remsong [Playlist Name] press enter, then ([Song Name].mp3 | [Song Number]) : Remove song srom playlist\n");
+            printf("13. movel [Playlist Name] : Move to playlist\n");
             printf("14. back : Move to Global playlist\n");
             printf("15. help : List all commands\n");
             printf("16. exit : Exit media player\n");
@@ -251,7 +250,6 @@ int main(void)
                 printf("Song not available.\n");
             }
         } else if (strcmp(command, "list") == 0) {
-            system("clear");
             printf("List Song :\n");
             int cnt = 0;
             if (current_list == -1) {
@@ -287,7 +285,6 @@ int main(void)
                 }
             }
         } else if (strcmp(command, "pause") == 0) {
-            system("clear");
             pausestatus = 1;
             if (playstatus == 1) {
                 printf("Paused...\n");
@@ -295,7 +292,6 @@ int main(void)
                 printf("No song is played.\n");
             }
         } else if (strcmp(command, "prev") == 0) {
-            system("clear");
             if (current_list == -1)
                 current_mp3 = (current_mp3 - 1 + totalsong) % totalsong;
             else {
@@ -306,7 +302,6 @@ int main(void)
             playstatus = 1;
             printf("Playing Previous Song.\n");
         } else if (strcmp(command, "next") == 0) {
-            system("clear");
             if (current_list == -1)
                 current_mp3 = (current_mp3 + 1 + totalsong) % totalsong;
             else {
@@ -317,15 +312,13 @@ int main(void)
             playstatus = 1;
             printf("Playing Next Song.\n");
         } else if (strcmp(command, "resume") == 0) {
-            system("clear");
             pausestatus = 0;
             if (playstatus == 1) {
                 printf("Resume...\n");
             } else {
                 printf("No song is played.\n");
             }
-        } else if (strcmp(command, "listp") == 0) {
-            system("clear");
+        } else if (strcmp(command, "playlist") == 0) {
             if (totalList == 0) {
                 printf("No Available playlist.\n");
             } else {
@@ -334,7 +327,7 @@ int main(void)
                     printf("%2d. %s\n", i + 1, pname[i]);
                 }
             }
-        } else if (strcmp(command, "addp") == 0) {
+        } else if (strcmp(command, "addl") == 0) {
             char tmpplaylist[1005];
             scanf(" %[^\n]", tmpplaylist);
             system("clear");
@@ -352,7 +345,7 @@ int main(void)
                 totalList++;
                 printf("Playlist Created.\n");
             }
-        } else if (strcmp(command, "remp") == 0) {
+        } else if (strcmp(command, "reml") == 0) {
             char tmpplaylist[1005];
             scanf(" %[^\n]", tmpplaylist);
             system("clear");
@@ -376,7 +369,7 @@ int main(void)
                 totalList--;
                 printf("Playlist Removed.\n");
             }
-        } else if (strcmp(command, "addsp") == 0) {
+        } else if (strcmp(command, "addsong") == 0) {
             char tmpplaylist[1005];
             scanf(" %[^\n]", tmpplaylist);
             system("clear");
@@ -445,7 +438,7 @@ int main(void)
                     printf("Song not available.\n");
                 }
             }
-        } else if (strcmp(command, "remsp") == 0) {
+        } else if (strcmp(command, "remsong") == 0) {
             char tmpplaylist[1005];
             scanf(" %[^\n]", tmpplaylist);
             system("clear");
@@ -521,7 +514,7 @@ int main(void)
                     printf("Song not available.\n");
                 }
             }
-        } else if (strcmp(command, "movep") == 0) {
+        } else if (strcmp(command, "movel") == 0) {
             char tmpplaylist[1005];
             scanf(" %[^\n]", tmpplaylist);
             system("clear");
@@ -545,7 +538,6 @@ int main(void)
                 }
             }
         } else if (strcmp(command, "back") == 0) {
-            system("clear");
             if (current_list == -1) {
                 printf("You're already in the global playlist.\n");
             } else {
