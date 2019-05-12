@@ -210,8 +210,11 @@ int main(int argc, char *argv[])
             pthread_create(&tid,NULL,&player,now_playing);
             system("clear");
         }
-        else if (strcmp(type,"next")==0){
-            select_mp3++;
+        else if (strcmp(type,"next")==0 || strcmp(type,"prev")==0){
+            if(strcmp(type,"next")==0)
+                select_mp3++;
+            else
+                select_mp3--;
             int no = 1;
             dp = opendir(dirpath);
             while ((de = readdir(dp)) != NULL) {
@@ -236,50 +239,8 @@ int main(int argc, char *argv[])
                 continue;
             }
             else if (select_mp3<1){
-                printf("Song not found!\n");
-                select_mp3--;
-                sleep(2);
-                system("clear");
-                continue;
-            }
-
-            printf("Opening %s\n", now_playing);
-            mp3_play = 0;
-            sleep(1);
-            mp3_play = 1;
-            mp3_pause = 0;
-            mp3_seek = 0;
-            pthread_create(&tid,NULL,&player,now_playing);
-            system("clear");
-        }
-        else if (strcmp(type,"prev")==0){
-            select_mp3--;
-            int no = 1;
-            dp = opendir(dirpath);
-            while ((de = readdir(dp)) != NULL) {
-                int len = strlen(de->d_name);
-                char fn[1024];
-                sprintf(fn, "%s", de->d_name);
-                
-                if (strcmp(fn+strlen(fn)-4,".mp3")==0) {
-                    if (no == select_mp3) {
-                        sprintf(now_playing, "%s", de->d_name);
-                        no++;
-                        break;
-                    }
-                    no++;
-                }
-            }
-            if (select_mp3<1){
-                printf("Start of the list\n");
-                select_mp3--;
-                sleep(2);
-                system("clear");
-                continue;
-            }
-            else if (select_mp3>=no){
-                printf("Song not found\n");
-                select_mp3--;
+                printf("Start of the song list!\n");
+                select_mp3++;
                 sleep(2);
                 system("clear");
                 continue;
@@ -312,5 +273,12 @@ int main(int argc, char *argv[])
             sleep(1);
             system("clear");
         }
+        else
+        {
+            printf("Invalid command!!\n");
+            sleep(1);
+            system("clear");
+        }
+        
     }
 }
