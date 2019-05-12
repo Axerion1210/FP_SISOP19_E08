@@ -15,8 +15,8 @@ Terdapat 2 file, yaitu file readmp3.c dan mediaplayer.c. File readmp3.c untuk me
 
 ### readmp3.c
 
-text
+File ini dijalankan untuk mendapatkan semua file yang memiliki ekstensi mp3 dan disimpan pada sebuah filesystem tanpa ada direktori lain
 
 ### mediaplayer.c
 
-text
+File ini berfungsi sebagai media player untuk menjalankan
