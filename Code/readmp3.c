@@ -11,26 +11,24 @@
 #include <stdlib.h>
 #ifdef HAVE_SETXATTR
 #include <sys/xattr.h>
-#include<regex.h>
-
 #endif
 
 
-static const char *dirpath = "/home/siung2";
+static const char *dirpath = "/home/siung2"; //path root mount
 
-struct node {
-    char *value;
-    char *path;
+struct node { // untuk tree
+    char *value; // nama file
+    char *path; // path file
     struct node *p_left;
     struct node *p_right;
     int counter;
 };
 
-struct node *root = NULL;
+struct node *root = NULL; //inisialisasi root null
 //use typedef to make calling the compare function easier
 typedef int (*Compare)(const char *, const char *);
 
-int check(const char* text)
+int check(const char* text) ///untuk memeriksa apakah ekstensi mp3
 { 
     int length = strlen(text);
     if(length<5) return 0;
@@ -43,23 +41,22 @@ int check(const char* text)
 void insert(char* key, char* path, struct node** leaf, Compare cmp)
 {
     int res;
-    if( *leaf == NULL ) {
+    if( *leaf == NULL ) { // jika tree masih kosong lakukan inisialisasi root
         *leaf = (struct node*) malloc( sizeof( struct node ) );
-        (*leaf)->value = malloc( strlen (key) +1 );     // memory for key
-        strcpy ((*leaf)->value, key);                   // copy the key
-        (*leaf)->path = malloc( strlen (path) +1 );     // memory for key
-        strcpy ((*leaf)->path, path);
+        (*leaf)->value = malloc( strlen (key) +1 );     // memory untuk nama file
+        strcpy ((*leaf)->value, key);                   // copy nama file
+        (*leaf)->path = malloc( strlen (path) +1 );     // memory untuk path
+        strcpy ((*leaf)->path, path);					// copy path
         (*leaf)->p_left = NULL;
         (*leaf)->p_right = NULL;
         (*leaf)->counter = 0;
-        //printf(  "\nnew node for %s" , key);
     } else {
         res = cmp (key,(*leaf)->value);
-        if( res < 0)
+        if( res < 0) // ke kiri
             insert( key, path,&(*leaf)->p_left, cmp);
-        else if( res > 0)
+        else if( res > 0) // ke kanan
             insert( key, path,&(*leaf)->p_right, cmp);
-        else{
+        else{ // jika sama
             (*leaf) -> counter++;
             char temp[strlen(key)+100];
             sprintf(temp, "%s#%d", key, (*leaf)->counter);
@@ -69,26 +66,26 @@ void insert(char* key, char* path, struct node** leaf, Compare cmp)
     }
 }
 
-//compares value of the new node against the previous node
+//membandingkan nilai node
 int CmpStr(const char *a, const char *b)
 {
-    return (strcmp (a, b));     // string comparison instead of pointer comparison
+    return (strcmp (a, b));     //bandingkan nama file
 }
 
-//searches elements in the tree
+//untuk cari path
 char* search(char* key, struct node* leaf, Compare cmp)  // no need for **
 {
     int res;
-    if( leaf != NULL ) {
+    if( leaf != NULL ) { 
         res = cmp(key, leaf->value);
         if( res < 0)
-            search( key, leaf->p_left, cmp);
+            search( key, leaf->p_left, cmp); //cari ke kiri
         else if( res > 0)
-            search( key, leaf->p_right, cmp);
+            search( key, leaf->p_right, cmp); // cari ke kanan
         else
-            return leaf->path;
+            return leaf->path;  // return path
     }
-    else return "";
+    else return ""; // jika tidak ada
 }
 
 void delete_tree(struct node** leaf)
@@ -96,16 +93,16 @@ void delete_tree(struct node** leaf)
     if( *leaf != NULL ) {
         delete_tree(&(*leaf)->p_left);
         delete_tree(&(*leaf)->p_right);
-        free( (*leaf)->value );         // free the key
+        free( (*leaf)->value );
         free( (*leaf) );
     }
 }
 
 static int xmp_getattr(const char *path, struct stat *stbuf)
 {
-    char tmp[1024];
-    strcpy(tmp, path);
-    char *fpath = search(tmp, root, CmpStr);
+    char tmp[1024]; 
+    strcpy(tmp, path); // copy namafile
+    char *fpath = search(tmp, root, CmpStr); // cari path berdasarkan nama file
     int res;
 
 	res = lstat(fpath, stbuf);
@@ -124,22 +121,19 @@ static int listdir(const char *path, void *buf, fuse_fill_dir_t filler,
 	(void) offset;
 	(void) fi;
 
-    printf("++++++++%s\n",path);
 	dp = opendir(path);
 	if (dp == NULL)
 		return -errno;
     
 	while ((de = readdir(dp)) != NULL) {
-        printf("        .%s\n",path);
-        if( !strcmp(de->d_name, ".")|| !strcmp(de->d_name, ".."))
+        if( !strcmp(de->d_name, ".")|| !strcmp(de->d_name, "..")) //skip . dan ..
             continue;
-        if(de->d_type == DT_DIR){
+        if(de->d_type == DT_DIR){ // jika direktori, cari pada folder tersebut
             char new[1024];
             snprintf(new, sizeof(new), "%s/%s", path,de->d_name);
-            printf("--------%s\n",new);
             listdir(new, buf, filler, offset, fi);
         }
-        else{
+        else{// jika bukan direktori
             struct stat st;
             memset(&st, 0, sizeof(st));
             st.st_ino = de->d_ino;
@@ -147,10 +141,10 @@ static int listdir(const char *path, void *buf, fuse_fill_dir_t filler,
             char fname[1024], pathFile[1024];
             sprintf(fname, "/%s", de->d_name);
             sprintf(pathFile, "%s/%s", path,de->d_name);
-            if(check(de->d_name)){
-                if (filler(buf,de->d_name, &st, 0))
+            if(check(de->d_name)){ // jika berekstensi mp3
+                if (filler(buf,de->d_name, &st, 0)) //catat untuk ditampilkan
 			    break;
-                insert(fname, pathFile, &root, CmpStr);
+                insert(fname, pathFile, &root, CmpStr); //  catat pada tree
             }
         }
 	}
@@ -158,6 +152,8 @@ static int listdir(const char *path, void *buf, fuse_fill_dir_t filler,
 	return 0;
 }
 
+
+//fungsi readdir yang pertama dipanggil, lalu memanggil listdir
 static int xmp_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 		       off_t offset, struct fuse_file_info *fi)
 {
@@ -172,7 +168,7 @@ static int xmp_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 }
 
 static void *inits(struct fuse_conn_info *conn){
-    insert("/",dirpath, &root, CmpStr);
+    insert("/",dirpath, &root, CmpStr); // masukkan pada tree untuk root nya
 }
 
 static int xmp_statfs(const char *path, struct statvfs *stbuf)
