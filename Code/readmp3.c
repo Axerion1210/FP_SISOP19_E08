@@ -7,6 +7,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <sys/time.h>
+#include <sys/types.h>
 #include <stdlib.h>
 #ifdef HAVE_SETXATTR
 #include <sys/xattr.h>
@@ -15,7 +16,7 @@
 #endif
 
 
-static const char *dirpath = "/home/ivan/Music";
+static const char *dirpath = "/home/ivan";
 
 struct node {
     char *value;
@@ -108,8 +109,6 @@ void delete_tree(struct node** leaf)
     }
 }
 
-
-
 static int xmp_getattr(const char *path, struct stat *stbuf)
 {
     char tmp[1024];
@@ -124,34 +123,34 @@ static int xmp_getattr(const char *path, struct stat *stbuf)
 	return 0;
 }
 
-
 static int listdir(const char *path, void *buf, fuse_fill_dir_t filler,
 		       off_t offset, struct fuse_file_info *fi)
 {
     DIR *dp;
 	struct dirent *de;
-
 	(void) offset;
 	(void) fi;
 
+    printf("++++++++%s\n",path);
 	dp = opendir(path);
 	if (dp == NULL)
 		return -errno;
-
+    
 	while ((de = readdir(dp)) != NULL) {
+        printf("        .%s\n",path);
+        if( !strcmp(de->d_name, ".")|| !strcmp(de->d_name, ".."))
+            continue;
         if(de->d_type == DT_DIR){
             char new[1024];
-            if( !strcmp(de->d_name, ".")|| !strcmp(de->d_name, "..")){
-                continue;
-            }
-            snprintf(new, sizeof(new), "%s/%s", path, de->d_name);
+            snprintf(new, sizeof(new), "%s/%s", path,de->d_name);
+            printf("--------%s\n",new);
             listdir(new, buf, filler, offset, fi);
         }
         else{
-        struct stat st;
-		memset(&st, 0, sizeof(st));
-		st.st_ino = de->d_ino;
-		st.st_mode = de->d_type << 12;
+            struct stat st;
+            memset(&st, 0, sizeof(st));
+            st.st_ino = de->d_ino;
+            st.st_mode = de->d_type << 12;
             char fname[1024], pathFile[1024];
             sprintf(fname, "/%s", de->d_name);
             sprintf(pathFile, "%s/%s", path,de->d_name);
@@ -160,15 +159,11 @@ static int listdir(const char *path, void *buf, fuse_fill_dir_t filler,
 			    break;
                 insert(fname, pathFile, &root, CmpStr);
             }
-            
         }
 	}
 	closedir(dp);
 	return 0;
 }
-
-
-
 
 static int xmp_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 		       off_t offset, struct fuse_file_info *fi)
@@ -181,34 +176,10 @@ static int xmp_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 	}
 	else sprintf(fpath, "%s%s",dirpath,path);
     listdir(fpath, buf, filler, offset,fi);
-    /*
-    DIR *dp;
-	struct dirent *de;
-
-	(void) offset;
-	(void) fi;
-
-	dp = opendir(fpath);
-	if (dp == NULL)
-		return -errno;
-
-	while ((de = readdir(dp)) != NULL) {
-		struct stat st;
-		memset(&st, 0, sizeof(st));
-		st.st_ino = de->d_ino;
-		st.st_mode = de->d_type << 12;
-		if (filler(buf, de->d_name, &st, 0))
-			break;
-	}
-
-	closedir(dp);
-	return 0;
-    */
 }
 
 static void *inits(struct fuse_conn_info *conn){
     insert("/",dirpath, &root, CmpStr);
-
 }
 
 static int xmp_statfs(const char *path, struct statvfs *stbuf)
