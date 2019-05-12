@@ -199,7 +199,7 @@ int main(void)
             int zzz = -1;
             int cnt = 0;
             int sz = strlen(song);
-            if (sz > 4 && song[sz - 1] == '3' && song[sz - 2] == 'p' && song[sz - 3] == 'm' && song[sz - 4] == '.') {
+            if (sz > 4 && strcmp(tmpsong+sz-4,".mp3") == 0) {
                 while ((de = readdir(dp)) != NULL) {
                     if (strcmp(de->d_name, "..") == 0 || strcmp(de->d_name, ".") == 0)
                         continue;
@@ -473,7 +473,7 @@ int main(void)
                 int sgidx = -1;
                 cnt = 0;
                 int sz = strlen(tmpsong);
-                if (sz > 4 && strcmp(tmpsong+sz-4,".mp3")) {
+                if (sz > 4 && strcmp(tmpsong+sz-4,".mp3") == 0) {
                     int xxx = 0;
                     while ((de = readdir(dp)) != NULL) {
                         if (strcmp(de->d_name, "..") == 0 || strcmp(de->d_name, ".") == 0)
