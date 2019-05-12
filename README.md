@@ -249,4 +249,29 @@ int main(int argc, char *argv[])
 
 ### mediaplayer.c
 
-File ini berfungsi sebagai media player untuk menjalankan
+File ini berfungsi sebagai media player untuk menjalankan file-file mp3 layaknya media player pada umumnya. Di dalamnya terdapat menu-menu untuk menjalankan perintah yang berbeda.
+1. help : untuk menampilkan command list yang ada
+
+  ```c
+  ```
+
+2. list : untuk menampilkan list lagu yang ada atau menampilkan list lagu dari playlist tertentu
+
+
+3. play : untuk memainkan lagu tertentu
+
+
+4. stop : untuk menghentikan lagu yang sedang berjalan
+
+5. next : untuk memainkan lagu berikutnya
+6. prev : untuk memainkan lagu sebelumnya
+7. pause : untuk memunda lagu yang sedang berjalan
+8. resume : untuk melanjutkan lagu yang sebelumnya ditunda
+9. playlist : untuk menampilkan list dari playlist yang ada
+10. addl : untuk membuat playlist baru
+11. reml : untuk menghapus playlist tertentu
+12. addsong : untuk menambahkan lagu ke playlist tertentu
+13. remsong : untuk menghapus lagu tertentu di sebuah playlist
+14. movel : untuk pindah ke sebuah playlist
+15. back : untuk kembali ke playlist global
+16. exit : untuk keluar dari media player
